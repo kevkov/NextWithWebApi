@@ -1,18 +1,68 @@
+'use client'
+
 import Image from "next/image";
 import styles from "./page.module.css";
+import React, {useEffect, useState} from "react";
+
+
+interface WeatherForecast {
+  date: string;
+  temperatureC: number;
+  temperatureF: number;
+  summary: string;
+}
 
 export default function Home() {
+
+  const [forecasts, setForecasts] = useState<WeatherForecast[]>();
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/weatherforecast');
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        const data: WeatherForecast[] = await response.json();
+        setForecasts(data);
+      } catch (error) {
+        console.error('Error fetching weather forecasts:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+            className={styles.logo}
+            src="https://nextjs.org/icons/next.svg"
+            alt="Next.js logo"
+            width={180}
+            height={38}
+            priority
         />
+
+        <div>
+          <h1>Weather Forecast</h1>
+          <ul>
+            {forecasts && forecasts.map((forecast, index) => (
+                <li key={index}>
+                  Date: {forecast.date} | Temperature(C): {forecast.temperatureC} | Summary: {forecast.summary}
+                </li>
+            ))}
+          </ul>
+        </div>
+        
         <ol>
           <li>
             Get started by editing <code>src/app/page.tsx</code>.
@@ -22,25 +72,25 @@ export default function Home() {
 
         <div className={styles.ctas}>
           <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              className={styles.primary}
+              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+              target="_blank"
+              rel="noopener noreferrer"
           >
             <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+                className={styles.logo}
+                src="https://nextjs.org/icons/vercel.svg"
+                alt="Vercel logomark"
+                width={20}
+                height={20}
             />
             Deploy now
           </a>
           <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
+              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.secondary}
           >
             Read our docs
           </a>
@@ -48,14 +98,14 @@ export default function Home() {
       </main>
       <footer className={styles.footer}>
         <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
         >
           <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
+              aria-hidden
+              src="https://nextjs.org/icons/file.svg"
+              alt="File icon"
             width={16}
             height={16}
           />
